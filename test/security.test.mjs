@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import {verifyPaddle,validateInput,allowRequest,hashKey} from '../src/security.mjs';
+const secret='test-only-secret',raw='{"event_type":"transaction.completed"}',ts=String(Math.floor(Date.now()/1000));
+const sign=(t,body=raw)=>`ts=${t};h1=${crypto.createHmac('sha256',secret).update(`${t}:${body}`).digest('hex')}`;
+test('Paddle accepts exact raw body signature',()=>assert.equal(verifyPaddle(raw,sign(ts),secret),true));
+test('Paddle rejects malformed hashes without exception',()=>{for(const sig of ['',`ts=${ts};h1=x`,`ts=${ts};h1=${'0'.repeat(64)}`,`ts=nan;h1=${'0'.repeat(64)}`])assert.equal(verifyPaddle(raw,sig,secret),false)});
+test('Paddle rejects tampering, replay and future signatures',()=>{assert.equal(verifyPaddle(raw+' ',sign(ts),secret),false);for(const t of [Number(ts)-301,Number(ts)+301])assert.equal(verifyPaddle(raw,sign(t),secret),false)});
+test('Paddle supports multiple signatures',()=>assert.equal(verifyPaddle(raw,`ts=${ts};h1=${'0'.repeat(64)};${sign(ts).split(';')[1]}`,secret),true));
+test('invalid tool payloads rejected',()=>{for(const b of [null,[],{}, {input:12},{input:'x',options:[]}])assert.throws(()=>validateInput(b));validateInput({input:'x',options:{}})});
+test('rate limit resets per window',()=>{assert(allowRequest('test',2,0));assert(allowRequest('test',2,1));assert(!allowRequest('test',2,2));assert(allowRequest('test',2,60000))});
+test('API key hash is deterministic, not plaintext',()=>{assert.equal(hashKey('mf_test').length,64);assert.equal(hashKey('mf_test'),hashKey('mf_test'));assert.notEqual(hashKey('mf_test'),hashKey('mf_other'))});
