@@ -15,13 +15,22 @@ if(buyButtons.length){
       const account=JSON.parse(localStorage.getItem('mf_account')||'null') || await (await fetch('/api/account',{method:'POST',headers:{'content-type':'application/json'},body:'{}'})).json();
       localStorage.setItem('mf_account',JSON.stringify(account));
       if(cfg.environment==='sandbox'&&window.Paddle?.Environment) Paddle.Environment.set('sandbox');
-      Paddle.Initialize({token:cfg.clientToken});
+      Paddle.Initialize({token:cfg.clientToken,eventCallback:data=>{if(data?.name==='checkout.completed')event('checkout_completed','pricing',{transactionId:data.data?.transaction_id||null});}});
       status.textContent=`Shared account ready · ${account.credits||0} credits`;
       buyButtons.forEach(btn=>btn.onclick=()=>{
         const priceId=cfg.prices[btn.dataset.buy];
         if(!priceId){status.textContent='This pack is not configured yet.';return;}
+        event('checkout_started','pricing',{pack:btn.dataset.buy});
         Paddle.Checkout.open({items:[{priceId,quantity:1}],customData:{userId:account.id,tool:'pricing'}});
       });
     }catch(e){status.textContent=`Payments unavailable: ${e.message}`;buyButtons.forEach(b=>b.disabled=true);}
   })();
 }
+
+const contact=q('#contact-form');
+if(contact)contact.addEventListener('submit',async e=>{
+  e.preventDefault();const status=q('#contact-status'),email=q('#contact-email').value,message=q('#contact-message').value;
+  status.textContent='Sending…';
+  try{const r=await fetch('/api/contact',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,message})});if(!r.ok)throw new Error((await r.json()).error||'Request failed');status.textContent='Message received.';q('#contact-message').value='';}
+  catch(err){status.textContent=err.message||'Could not send message.';}
+});
