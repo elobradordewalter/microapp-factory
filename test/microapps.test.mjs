@@ -41,7 +41,7 @@ for(const a of apps){
     const reject={
       json_format:['{',o],json_minify:['{',o],json_sort:['{',o],json_flatten:['{',o],json_repair:['{oops',o],json_to_csv:['{}',o],
       csv_columns:[a.sample,{...o,columns:'missing_column'}],csv_sort:[a.sample,{...o,column:'missing_column'}],
-      regex_test:['x',{...o,pattern:'['}],url_decode:['%',o],utm_builder:['',o],timestamp_convert:['not-a-date',o],
+      utm_builder:['',o],percentage:['',o],regex_test:['x',{...o,pattern:'['}],url_decode:['%',o],timestamp_convert:['not-a-date',o],
       unit_convert:['1',{...o,from:'m',to:'kg'}],margin:['10',{...o,price:'0'}],markup:['0',{...o,price:'10'}],
       concrete:['x',o],bricks:['10',{...o,blockLength:'0'}]
     }[a.engine];

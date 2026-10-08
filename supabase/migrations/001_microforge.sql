@@ -120,7 +120,7 @@ create or replace function public.mf_create_user(
 ) returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
 begin
   perform public.mf_assert_secret(p_secret);
-  insert into public.users(id,email) values(p_user_id,nullif(lower(trim(coalesce(p_email,''))),'')); 
+  insert into public.users(id,email) values(p_user_id,nullif(lower(trim(coalesce(p_email,''))),''));
   insert into public.credit_balances(user_id,credits) values(p_user_id,0);
   insert into public.api_keys(user_id,key_hash,key_prefix) values(p_user_id,p_api_key_hash,p_api_key_prefix);
   return jsonb_build_object('id',p_user_id,'email',lower(trim(coalesce(p_email,''))),'credits',0,'createdAt',now());

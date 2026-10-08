@@ -10,6 +10,7 @@ export function parseCSV(input, delimiter=','){
     else if(c==='\n'){row.push(field.replace(/\r$/,''));rows.push(row);row=[];field='';}
     else field+=c;
   }
+  if(q)throw new Error('Unterminated quoted CSV field');
   row.push(field.replace(/\r$/,'')); if(row.some(x=>x!=='' )||rows.length===0)rows.push(row);
   return rows;
 }
@@ -18,7 +19,7 @@ const sortObject=(v)=>Array.isArray(v)?v.map(sortObject):(v&&typeof v==='object'
 const flatten=(obj,prefix='',out={})=>{for(const [k,v] of Object.entries(obj)){const key=prefix?`${prefix}.${k}`:k;if(v&&typeof v==='object'&&!Array.isArray(v))flatten(v,key,out);else out[key]=Array.isArray(v)?JSON.stringify(v):v;}return out};
 const htmlEsc=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 const titleCase=s=>s.toLowerCase().replace(/\b\p{L}/gu,m=>m.toUpperCase());
-const num=v=>{const n=Number(v);if(!Number.isFinite(n))throw new Error('Enter a valid number');return n};
+const num=v=>{if(v===null||v===undefined||typeof v==='boolean'||String(v).trim()==='')throw new Error('Enter a valid number');const n=Number(v);if(!Number.isFinite(n))throw new Error('Enter a valid number');return n};
 function markdown(s){let out=htmlEsc(s);out=out.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`(.+?)`/g,'<code>$1</code>');out=out.replace(/(?:^|\n)(- .+(?:\n- .+)*)/g,m=>'<ul>'+m.trim().split('\n').map(x=>`<li>${x.slice(2)}</li>`).join('')+'</ul>');return out.split(/\n{2,}/).map(x=>/^<h\d|^<ul>/.test(x)?x:`<p>${x.replaceAll('\n','<br>')}</p>`).join('\n');}
 function repairJSON(s){let x=s.trim();x=x.replace(/([{,]\s*)([A-Za-z_$][\w$-]*)(\s*:)/g,'$1"$2"$3');x=x.replace(/'([^'\\]*(?:\\.[^'\\]*)*)'/g,(_,a)=>`"${a.replaceAll('"','\\"')}"`);x=x.replace(/,\s*([}\]])/g,'$1');return JSON.stringify(JSON.parse(x),null,2)}
 async function digestSHA256(input){if(globalThis.crypto?.subtle){const data=new TextEncoder().encode(input);const h=await crypto.subtle.digest('SHA-256',data);return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('');} const {createHash}=await import('node:crypto');return createHash('sha256').update(input).digest('hex');}
@@ -68,14 +69,14 @@ export async function runEngine(engine,input='',options={}){
     case 'sitemap_xml':{const urls=s.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`  <url><loc>${htmlEsc(u)}</loc></url>`).join('\n')}\n</urlset>`}
     case 'utm_builder':{const u=new URL(s.trim());for(const k of ['source','medium','campaign']){const v=options[k];if(v)u.searchParams.set(`utm_${k}`,v)}return u.toString()}
     case 'uuid_generate':{const n=Math.max(1,Math.min(100,num(s||1)));return Array.from({length:n},()=>crypto.randomUUID()).join('\n')}
-    case 'timestamp_convert':{const x=s.trim();if(/^\d+(\.\d+)?$/.test(x)){const n=Number(x);const ms=x.length<=10?n*1000:n;return new Date(ms).toISOString()}const d=new Date(x);if(Number.isNaN(d.getTime()))throw new Error('Enter a Unix timestamp or valid date');return JSON.stringify({unixSeconds:Math.floor(d.getTime()/1000),unixMilliseconds:d.getTime(),iso:d.toISOString()},null,2)}
+    case 'timestamp_convert':{const x=s.trim();if(/^-?\d+(\.\d+)?$/.test(x)){const n=Number(x);const ms=x.replace(/^-/, '').split('.')[0].length<=10?n*1000:n;return new Date(ms).toISOString()}const d=new Date(x);if(Number.isNaN(d.getTime()))throw new Error('Enter a Unix timestamp or valid date');return JSON.stringify({unixSeconds:Math.floor(d.getTime()/1000),unixMilliseconds:d.getTime(),iso:d.toISOString()},null,2)}
     case 'sha256':return await digestSHA256(s);
-    case 'unit_convert':{const from=options.from,to=options.to,v=num(s);const kind={m:'len',cm:'len',mm:'len',km:'len',ft:'len',in:'len',kg:'mass',g:'mass',lb:'mass',C:'temp',F:'temp'};if(kind[from]!==kind[to])throw new Error('Choose compatible unit types');if(kind[from]==='temp'){let c=from==='C'?v:(v-32)*5/9;return String(to==='C'?c:c*9/5+32)}const factors={m:1,cm:.01,mm:.001,km:1000,ft:.3048,in:.0254,kg:1,g:.001,lb:.45359237};return String(v*factors[from]/factors[to])}
+    case 'unit_convert':{const from=options.from,to=options.to,v=num(s);const kind={m:'len',cm:'len',mm:'len',km:'len',ft:'len',in:'len',kg:'mass',g:'mass',lb:'mass',C:'temp',F:'temp'};if(!kind[from]||!kind[to]||kind[from]!==kind[to])throw new Error('Choose compatible unit types');if(kind[from]==='temp'){let c=from==='C'?v:(v-32)*5/9;return String(to==='C'?c:c*9/5+32)}const factors={m:1,cm:.01,mm:.001,km:1000,ft:.3048,in:.0254,kg:1,g:.001,lb:.45359237};return String(v*factors[from]/factors[to])}
     case 'percentage':return String(num(s)*num(options.percent)/100);
     case 'margin':{const cost=num(s),price=num(options.price);if(price===0)throw new Error('Selling price cannot be zero');return JSON.stringify({profit:price-cost,marginPercent:Number((((price-cost)/price)*100).toFixed(2))},null,2)}
     case 'markup':{const cost=num(s),price=num(options.price);if(cost===0)throw new Error('Cost cannot be zero');return JSON.stringify({profit:price-cost,markupPercent:Number((((price-cost)/cost)*100).toFixed(2))},null,2)}
-    case 'concrete':{const L=num(s),W=num(options.width),T=num(options.thickness)/100,w=num(options.waste||0)/100;const net=L*W*T;return JSON.stringify({netM3:Number(net.toFixed(3)),withWasteM3:Number((net*(1+w)).toFixed(3))},null,2)}
-    case 'bricks':{const area=num(s),bl=num(options.blockLength)/100,bh=num(options.blockHeight)/100,w=num(options.waste||0)/100;if(bl<=0||bh<=0)throw new Error('Block dimensions must be positive');const per=1/(bl*bh);return JSON.stringify({blocksPerM2:Number(per.toFixed(2)),netBlocks:Math.ceil(area*per),withWasteBlocks:Math.ceil(area*per*(1+w))},null,2)}
+    case 'concrete':{const L=num(s),W=num(options.width),T=num(options.thickness)/100,w=num(options.waste||0)/100;if(L<0||W<0||T<0||w<0)throw new Error('Dimensions and waste must be non-negative');const net=L*W*T;return JSON.stringify({netM3:Number(net.toFixed(3)),withWasteM3:Number((net*(1+w)).toFixed(3))},null,2)}
+    case 'bricks':{const area=num(s),bl=num(options.blockLength)/100,bh=num(options.blockHeight)/100,w=num(options.waste||0)/100;if(area<0||w<0)throw new Error('Area and waste must be non-negative');if(bl<=0||bh<=0)throw new Error('Block dimensions must be positive');const per=1/(bl*bh);return JSON.stringify({blocksPerM2:Number(per.toFixed(2)),netBlocks:Math.ceil(area*per),withWasteBlocks:Math.ceil(area*per*(1+w))},null,2)}
     default:throw new Error(`Unknown engine: ${engine}`);
   }
 }
