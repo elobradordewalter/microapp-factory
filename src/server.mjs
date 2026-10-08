@@ -38,4 +38,4 @@ const server=http.createServer(async(req,res)=>{const url=new URL(req.url,BASE);
   if(req.method==='GET'){const slug=url.pathname.slice(1);const a=bySlug[slug];if(a){text(res,200,toolPage(a),'text/html; charset=utf-8');return}}
   text(res,404,'Not found');
 }catch(e){await logEvent({type:'error',path:url.pathname,message:e.message});json(res,e.status||400,{error:e.message})}});
-server.listen(PORT,()=>console.log(`MicroForge listening on ${BASE}`));
+server.listen(PORT,()=>{console.log(`MicroForge listening on ${BASE}`);if(process.env.PADDLE_CLIENT_TOKEN){fetch('https://api.paddle.com/checkout-domains',{headers:{authorization:`Bearer ${process.env.PADDLE_CLIENT_TOKEN}`}}).then(async r=>{const t=await r.text();console.log('PADDLE_DOMAIN_DIAG',r.status,t.slice(0,1200));}).catch(e=>console.log('PADDLE_DOMAIN_DIAG_ERROR',e.message));}});
