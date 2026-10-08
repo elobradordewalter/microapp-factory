@@ -67,3 +67,17 @@ const server=http.createServer(async(req,res)=>{const url=new URL(req.url,BASE);
   text(res,404,'Not found');
 }catch(e){try{await logEvent({type:'error',path:url.pathname});}catch{}json(res,e instanceof SyntaxError?400:e.status||500,{error:e instanceof SyntaxError?'Invalid JSON':e.status?e.message:'Request could not be completed'})}});
 server.listen(PORT,()=>console.log(`MicroForge listening on ${BASE} port ${server.address().port}`));
+// Startup persistence probe: no credentials or user data are printed.
+if (storageMode === 'supabase' && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  (async () => {
+    try {
+      const account = await createUser('');
+      const loaded = await getByApiKey(account.apiKey);
+      if (!loaded || loaded.id !== account.id) throw new Error('Readback mismatch');
+      console.log('MF_PERSISTENCE_SMOKE_PASS');
+    } catch (error) {
+      console.error('MF_PERSISTENCE_SMOKE_FAIL', error.status || 'unknown');
+    }
+  })();
+}
+
