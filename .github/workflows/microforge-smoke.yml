@@ -1,0 +1,35 @@
+name: MicroForge live persistence smoke test
+on:
+  push:
+    paths:
+      - '.github/workflows/microforge-smoke.yml'
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test account creation and persistence without printing credentials
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, urllib.error, uuid, sys
+          base='https://microforge.onrender.com'
+          email='qa-'+str(uuid.uuid4())+'@example.invalid'
+          def req(path, method='GET', payload=None, key=None):
+              headers={'Content-Type':'application/json'}
+              if key: headers['Authorization']='Bearer '+key
+              data=json.dumps(payload).encode() if payload is not None else None
+              with urllib.request.urlopen(urllib.request.Request(base+path,data=data,headers=headers,method=method),timeout=30) as r:
+                  return r.status,json.load(r)
+          try:
+              code,created=req('/api/account','POST',{'email':email})
+              assert code==201 and created.get('apiKey') and created.get('id'), 'creation invalid'
+              key=created['apiKey']
+              code,loaded=req('/api/account',key=key)
+              assert code==200 and loaded.get('id')==created['id'], 'readback mismatch'
+              assert loaded.get('credits')==created.get('credits'), 'balance mismatch'
+              print('PASS account POST 201, authenticated GET 200, same user and balance; credentials omitted')
+          except Exception as e:
+              print('FAIL live account persistence:',type(e).__name__,str(e)[:180])
+              sys.exit(1)
+          PY
