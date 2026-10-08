@@ -80,7 +80,8 @@ function aggregate(events,users=0){
     if(e.type==='purchase')revenue+=Number(e.revenue||0);cost+=Number(e.estimatedCostUsd||0);
   }
   const rows=Object.entries(tools).map(([tool,v])=>({tool,...v,conversionRate:v.visits?Number(((v.conversions/v.visits)*100).toFixed(2)):0,growthPercent:v.prev7?Number((((v.last7-v.prev7)/v.prev7)*100).toFixed(1)):(v.last7?100:0)}));
-  return {users,revenue,estimatedCostUsd:Number(cost.toFixed(6)),events:events.length,apiCalls,purchases,errors,tools:rows.sort((a,b)=>b.revenue-a.revenue||b.processes-a.processes),rankings:{traffic:[...rows].sort((a,b)=>b.visits-a.visits).slice(0,10),conversion:[...rows].filter(x=>x.visits>=1).sort((a,b)=>b.conversionRate-a.conversionRate).slice(0,10),revenue:[...rows].sort((a,b)=>b.revenue-a.revenue).slice(0,10),growth:[...rows].sort((a,b)=>b.growthPercent-a.growthPercent).slice(0,10)}};
+  const contacts=events.filter(e=>e.type==='contact').slice(-20).reverse().map(e=>({email:String(e.email||''),message:String(e.message||''),ts:e.ts||e.created_at||''}));
+  return {users,revenue,estimatedCostUsd:Number(cost.toFixed(6)),events:events.length,apiCalls,purchases,errors,contacts,tools:rows.sort((a,b)=>b.revenue-a.revenue||b.processes-a.processes),rankings:{traffic:[...rows].sort((a,b)=>b.visits-a.visits).slice(0,10),conversion:[...rows].filter(x=>x.visits>=1).sort((a,b)=>b.conversionRate-a.conversionRate).slice(0,10),revenue:[...rows].sort((a,b)=>b.revenue-a.revenue).slice(0,10),growth:[...rows].sort((a,b)=>b.growthPercent-a.growthPercent).slice(0,10)}};
 }
 
 export async function getDashboard(){
