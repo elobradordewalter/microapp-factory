@@ -2,7 +2,7 @@ name: MicroForge production availability
 # Wakes the free Render instance with GET requests. No payments or users created.
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '2-59/5 * * * *' # Avoid GitHub scheduler congestion at minute 0
   workflow_dispatch:
   push:
     paths:
