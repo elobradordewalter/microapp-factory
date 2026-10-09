@@ -68,7 +68,7 @@ const server=http.createServer(async(req,res)=>{const url=new URL(req.url,BASE);
 }catch(e){try{await logEvent({type:'error',path:url.pathname});}catch{}json(res,e instanceof SyntaxError?400:e.status||500,{error:e instanceof SyntaxError?'Invalid JSON':e.status?e.message:'Request could not be completed'})}});
 server.listen(PORT,()=>console.log(`MicroForge listening on ${BASE} port ${server.address().port}`));
 // Startup persistence probe: no credentials or user data are printed.
-console.log('MF_PERSISTENCE_PROBE_CONFIG',JSON.stringify({storageMode,hasUrl:Boolean(process.env.SUPABASE_URL),hasServiceRole:Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),supabaseEnvKeyNames:Object.keys(process.env).filter(k=>k.startsWith('SUPA')).map(k=>({name:k,hasValue:Boolean(process.env[k])}))}));
+console.log('MF_PERSISTENCE_PROBE_CONFIG',JSON.stringify({storageMode,hasUrl:Boolean(process.env.SUPABASE_URL),hasServiceRole:Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),supabaseEnvKeyNames:Object.keys(process.env).filter(k=>k.startsWith('SUPA')).map(k=>({name:k,hasValue:Boolean(process.env[k])})),supabaseUrlLooksValid:/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(process.env.SUPABASE_URL||''),serviceRoleLooksJwt:/^eyJ[A-Za-z0-9_-]+\./.test(process.env.SUPABASE_SERVICE_ROLE_KEY||'')}));
 if (storageMode === 'supabase' && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
   (async () => {
     try {
