@@ -15,7 +15,7 @@ if(buyButtons.length){
       const account=JSON.parse(localStorage.getItem('mf_account')||'null') || await (await fetch('/api/account',{method:'POST',headers:{'content-type':'application/json'},body:'{}'})).json();
       localStorage.setItem('mf_account',JSON.stringify(account));
       if(cfg.environment==='sandbox'&&window.Paddle?.Environment) Paddle.Environment.set('sandbox');
-      Paddle.Initialize({token:cfg.clientToken,eventCallback:data=>{if(data?.name==='checkout.completed')event('checkout_completed','pricing');}});
+      Paddle.Initialize({token:cfg.clientToken,eventCallback:data=>{if(data?.name==='checkout.completed')event('checkout_completed','pricing');if(data?.name==='checkout.error'){const code=String(data.code||data.type||'unknown').slice(0,80);status.textContent='Paddle checkout error: '+code+' — '+String(data.detail||'Check Paddle Checkout configuration and default payment link.').slice(0,220);console.error('MicroForge Paddle checkout error',{code,detail:data.detail,documentation_url:data.documentation_url});}}});
       status.textContent=`Shared account ready · ${account.credits||0} credits`;
       buyButtons.forEach(btn=>btn.onclick=()=>{
         const priceId=cfg.prices[btn.dataset.buy];
