@@ -24,3 +24,13 @@ test('API automation landing is linked, indexable and offers real demos',()=>{
   assert.match(server,/Try CSV to JSON free/);
   assert.match(server,/microforge\.postman_collection\.json/);
 });
+
+test('funnel acquisition and conversion improvements are present',()=>{
+  assert.ok(server.includes('data-cta="tool-pricing"'));
+  assert.ok(server.includes('Validate JSON. Clean CSV.'));
+  assert.ok(server.includes('sessionHash'));
+  assert.ok(server.includes('MF_PERSISTENCE_READ_PROBE_PASS'));
+  assert.ok(!server.includes("const account = await createUser('');"));
+  assert.ok(client.includes("event('page_view'"));
+  assert.ok(client.includes("event('checkout_error'"));
+});
