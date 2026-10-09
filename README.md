@@ -2,6 +2,8 @@
 
 **Validate, format, repair, convert and clean structured data.** Try our tools in your browser for free, or use one API key and shared credits to automate repeat jobs from scripts and authorized AI agents.
 
+**Developer landing page:** [JSON & CSV automation API](https://microforge.onrender.com/json-csv-api) · [Import Postman collection](https://github.com/elobradordewalter/microapp-factory/blob/main/integrations/microforge.postman_collection.json)
+
 **Start here:** [Try JSON Validator](https://microforge.onrender.com/tools/json-validator) · [Try CSV to JSON](https://microforge.onrender.com/tools/csv-to-json) · [See all 50 tools](https://microforge.onrender.com/tools) · [API examples](https://microforge.onrender.com/api-docs) · [Pricing](https://microforge.onrender.com/pricing)
 
 **API credit packs:** Mini $3 / 300 credits · Basic $7 / 1,000 credits · Pro $15 / 3,000 credits · Monthly $9 / 2,000 credits per month. Browser tools are free for ordinary use; credits pay for authenticated API calls. Verify current terms and availability at checkout.

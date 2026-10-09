@@ -1,0 +1,97 @@
+{
+  "info": {
+    "name": "MicroForge JSON & CSV Automation API",
+    "description": "MicroForge API requires your personal API key and prepaid credits. See https://microforge.onrender.com/json-csv-api and /pricing. Never publish your secret API key.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://microforge.onrender.com"
+    },
+    {
+      "key": "api_key",
+      "value": ""
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{api_key}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Read available tool schemas (no auth)",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "url": "{{base_url}}/api/tools"
+      }
+    },
+    {
+      "name": "Check my remaining credits",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/account"
+      }
+    },
+    {
+      "name": "Validate JSON",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"input\":\"{\\\"ok\\\":true,\\\"count\\\":2}\"}"
+        },
+        "url": "{{base_url}}/api/tools/json-validator"
+      }
+    },
+    {
+      "name": "CSV to JSON",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"input\":\"name,age\\nAna,30\\nLuis,35\"}"
+        },
+        "url": "{{base_url}}/api/tools/csv-to-json"
+      }
+    },
+    {
+      "name": "JSON to CSV",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"input\":\"[{\\\"name\\\":\\\"Ana\\\",\\\"age\\\":30}]\"}"
+        },
+        "url": "{{base_url}}/api/tools/json-to-csv"
+      }
+    }
+  ]
+}

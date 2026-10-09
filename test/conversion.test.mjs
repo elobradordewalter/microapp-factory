@@ -17,3 +17,10 @@ test('browser checkout UI remains syntactically valid',()=>{
   const checked=spawnSync(process.execPath,['--check','public/client.js'],{encoding:'utf8'});
   assert.equal(checked.status,0,checked.stderr);
 });
+
+test('API automation landing is linked, indexable and offers real demos',()=>{
+  assert.match(server,/json-csv-api/);
+  assert.match(server,/function jsonCsvLanding/);
+  assert.match(server,/Try CSV to JSON free/);
+  assert.match(server,/microforge\.postman_collection\.json/);
+});
