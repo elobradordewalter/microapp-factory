@@ -1,3 +1,17 @@
+# MicroForge — JSON & CSV Automation Tools
+
+**Validate, format, repair, convert and clean structured data.** Try our tools in your browser for free, or use one API key and shared credits to automate repeat jobs from scripts and authorized AI agents.
+
+**Start here:** [Try JSON Validator](https://microforge.onrender.com/tools/json-validator) · [Try CSV to JSON](https://microforge.onrender.com/tools/csv-to-json) · [See all 50 tools](https://microforge.onrender.com/tools) · [API examples](https://microforge.onrender.com/api-docs) · [Pricing](https://microforge.onrender.com/pricing)
+
+**API credit packs:** Mini $3 / 300 credits · Basic $7 / 1,000 credits · Pro $15 / 3,000 credits · Monthly $9 / 2,000 credits per month. Browser tools are free for ordinary use; credits pay for authenticated API calls. Verify current terms and availability at checkout.
+
+**Built for:** developers integrating JSON/CSV transformations; operations teams preparing exports; automation builders using Python, JavaScript and workflow tools. Your API key is private. Each listed tool has a machine-readable schema in the [catalog API](https://microforge.onrender.com/api/tools) and the platform publishes an [OpenAPI specification](https://microforge.onrender.com/openapi.json).
+
+**Current status:** Online availability and payment readiness can be checked at [health](https://microforge.onrender.com/health). Client purchases require a verified server-side payment event; no on-page checkout notification alone grants credits.
+
+---
+
 # MicroForge
 
 50 browser utilities and a shared credit API. Node 20+; `npm test` runs catalog, security, HTTP and adapter tests.
