@@ -64,7 +64,17 @@ jobs:
                   and d.get("paymentsReady") is True
               )
 
+          def paddle_config_ok(s):
+              d=json.loads(s)
+              return (
+                  d.get("enabled") is True
+                  and d.get("environment") == "live"
+                  and bool(d.get("clientToken"))
+                  and all(bool((d.get("prices") or {}).get(p)) for p in ("mini","basic","pro","monthly"))
+              )
+
           wait_for("/health", health_ok)
+          wait_for("/api/payments/paddle/config", paddle_config_ok, attempts=2)
           wait_for("/pricing", lambda html: "Simple credits for automation" in html and 'id="payment-status"' in html, attempts=2)
           wait_for("/tools/json-validator", lambda html: 'data-tool="json-validator"' in html, attempts=2)
           print("PASS: Storefront and server-side payment/persistence readiness verified; no charge made.")
