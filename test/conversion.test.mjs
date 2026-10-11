@@ -34,3 +34,18 @@ test('funnel acquisition and conversion improvements are present',()=>{
   assert.ok(client.includes("event('page_view'"));
   assert.ok(client.includes("event('checkout_error'"));
 });
+
+test('public API discovery points to live payment readiness without obsolete billing warnings',()=>{
+  const discovery=readFileSync(new URL('../src/discovery.mjs',import.meta.url),'utf8');
+  assert.ok(server.includes('Check <a href="/health">GET /health</a>'));
+  assert.ok(server.includes('[Payment readiness]'));
+  assert.ok(discovery.includes('Check GET /health for paymentsReady'));
+  for(const obsolete of [
+    'Billing remains disabled until persistent storage has been verified',
+    'Paid access is unavailable until billing storage is verified',
+    'Availability of paid credits depends on verified billing storage'
+  ]) {
+    assert.ok(!server.includes(obsolete));
+    assert.ok(!discovery.includes(obsolete));
+  }
+});

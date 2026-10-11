@@ -18,9 +18,9 @@
 
 50 browser utilities and a shared credit API. Node 20+; `npm test` runs catalog, security, HTTP and adapter tests.
 
-## Billing release gate
+## Billing availability
 
-Paid checkout and signed credit grants stay disabled until Supabase is configured and `PERSISTENCE_VERIFIED=true`. This flag must only be set after a deployed end-to-end test and persistence/restart check. Redis and local files remain legacy compatibility paths; they cannot enable billing.
+Paid checkout and signed credit grants are enabled only when Supabase is configured and `PERSISTENCE_VERIFIED=true`. The deployed service reports the effective state as `paymentsReady` at [/health](https://microforge.onrender.com/health), while [/pricing](https://microforge.onrender.com/pricing) shows current checkout availability. This flag must only be set after a deployed end-to-end test and persistence/restart check. Redis and local files remain legacy compatibility paths; they cannot enable billing.
 
 Server-only variables: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `PADDLE_WEBHOOK_SECRET`, `ADMIN_TOKEN`. Public Paddle configuration uses `PADDLE_CLIENT_TOKEN` and `PADDLE_PRICE_MINI/BASIC/PRO/MONTHLY`; environment is `PADDLE_ENV`. Never place database credentials in browser code.
 
