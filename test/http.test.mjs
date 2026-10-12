@@ -5,7 +5,8 @@ const secret='isolated-test-only',port=19000+Math.floor(Math.random()*10000),bas
 const child=spawn(process.execPath,['src/server.mjs'],{cwd:dir,env:{...process.env,SUPABASE_URL:'',SUPABASE_SERVICE_ROLE_KEY:'',PORT:String(port),BASE_URL:base,PADDLE_WEBHOOK_SECRET:secret,PADDLE_PRICE_MINI:'pri_test',UPSTASH_REDIS_REST_URL:'',UPSTASH_REDIS_REST_TOKEN:'',PERSISTENCE_VERIFIED:'false',ADMIN_TOKEN:''},stdio:['ignore','pipe','pipe']});
 try{await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);child.once('exit',c=>reject(new Error('Server exited '+c)))});
 const req=async(p,method='GET',body,headers={})=>fetch(base+p,{method,headers:{'content-type':'application/json',...headers},...(body===undefined?{}:{body:typeof body==='string'?body:JSON.stringify(body)})});
-for(const p of ['/health','/','/pricing','/privacy','/terms','/refunds','/contact','/robots.txt','/sitemap.xml','/tools/json-formatter','/tools/csv-cleaner','/tools/percentage-calculator','/openapi.json','/llms.txt'])assert.equal((await req(p)).status,200,p);
+for(const p of ['/health','/','/pricing','/privacy','/terms','/refunds','/contact','/robots.txt','/sitemap.xml','/1bd3fafdde80dc0ffe027d7c3798030d.txt','/tools/json-formatter','/tools/csv-cleaner','/tools/percentage-calculator','/openapi.json','/llms.txt'])assert.equal((await req(p)).status,200,p);
+assert.equal(await (await req('/1bd3fafdde80dc0ffe027d7c3798030d.txt')).text(),'1bd3fafdde80dc0ffe027d7c3798030d');
 assert.equal((await req('/admin')).status,401);assert.equal((await (await req('/api/tools')).json()).tools.length,50);assert.equal((await (await req('/api/payments/paddle/config')).json()).enabled,false);
 assert.equal((await req('/api/events','POST',{type:'purchase',revenue:500})).status,400);
 const account=await (await req('/api/account','POST',{})).json();assert.equal(account.credits,0);const auth={authorization:`Bearer ${account.apiKey}`};

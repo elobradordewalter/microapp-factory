@@ -3,6 +3,7 @@ import {toolDefinitions,openapi} from './discovery.mjs';
 import {verifyPaddle,validateInput,allowRequest,hashKey} from './security.mjs';
 import http from 'node:http';import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import {apps,bySlug} from './catalog.mjs';import {runEngine} from './engines.mjs';import {createUser,getByApiKey,useCredits,grantCredits,logEvent,getDashboard,storageMode,paymentsReady} from './store.mjs';
 const PORT=Number(process.env.PORT||8787);const BASE=process.env.BASE_URL||`http://localhost:${PORT}`;
+const INDEXNOW_KEY='1bd3fafdde80dc0ffe027d7c3798030d';
 const publicDir=path.resolve('public');
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const json=(res,status,obj)=>{res.writeHead(status,{'content-type':'application/json; charset=utf-8','cache-control':'no-store'});res.end(JSON.stringify(obj))};
@@ -61,6 +62,7 @@ const server=http.createServer(async(req,res)=>{const url=new URL(req.url,BASE);
     const auth=req.headers.authorization;if(auth&&!allowRequest('key:'+hashKey(auth),120))return json(res,429,{error:'API key rate limit exceeded'});
   }
   if(req.method==='GET'&&url.pathname.startsWith('/assets/')){if(staticFile(req,res))return;text(res,404,'Not found');return}
+  if(req.method==='GET'&&url.pathname===`/${INDEXNOW_KEY}.txt`){text(res,200,INDEXNOW_KEY);return}
   if(req.method==='GET'&&url.pathname==='/engines.js'){text(res,200,fs.readFileSync(path.resolve('src/engines.mjs')),'text/javascript; charset=utf-8');return}
   if(req.method==='GET'&&url.pathname==='/'){text(res,200,home(),'text/html; charset=utf-8');return}
   if(req.method==='GET'&&url.pathname==='/tools'){text(res,200,tools(),'text/html; charset=utf-8');return}
