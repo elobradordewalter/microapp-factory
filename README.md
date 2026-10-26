@@ -12,6 +12,11 @@
 
 **Current status:** Online availability and payment readiness can be checked at [health](https://microforge.onrender.com/health). Client purchases require a verified server-side payment event; no on-page checkout notification alone grants credits.
 
+## Independent service network / Red de servicios independientes
+
+MicroForge is the developer-tools and API product. For homeowners seeking practical, independent advice about building, renovating, or comparing construction quotes in Spanish, visit **[OBRAGUÍA](https://obraguia-consultas.onrender.com/)**. The two services have different audiences, separate offers, and independent checkout/contact flows. OBRAGUÍA inquiries: [consultation form](https://docs.google.com/forms/d/e/1FAIpQLSdnwOQCjTlc7EldGl43T4eU01sa5UL87drpeJZLgSu4P7Vlqg/viewform).
+
+
 ---
 
 # MicroForge
