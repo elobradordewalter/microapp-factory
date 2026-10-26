@@ -27,3 +27,11 @@ MicroForge: foros de automatización, comunidades de desarrollo, integradores, p
 
 ## Publicidad paga
 Antes de contratar: verificar atribución de conversiones, definir presupuesto máximo, costo por cliente objetivo, audiencia y condiciones de suspensión. No contratar sin autorización específica de importe y plataforma.
+
+## Auditoría y correcciones — 25/10/2026
+- La creación de un enlace con UTM **no demuestra tráfico**. Registrar clics solo cuando exista analítica real, no por el mero enlace.
+- El formulario de Google de OBRAGUÍA no incluye en estos enlaces un mecanismo confirmado de captura de UTM: la atribución de formularios está **pendiente**.
+- Las tres URL públicas comprobadas con una herramienta de lectura web (`MicroForge /health`, OBRAGUÍA web y guías) devolvieron **inaccesible desde esa herramienta**. Esto **no prueba caída**: Render Free puede necesitar reactivación. Verificar por HTTP con espera antes de anunciar tráfico o contratar anuncios.
+- No hay constancia verificada de publicaciones en foros ajenos, visitas externas ni compradores derivados de esta campaña. GitHub es un canal propio, no distribución externa.
+- Corrección de prioridades: 1) verificar destinos y checkout; 2) instrumentar visitas y formularios; 3) captar en canales externos donde se permita promoción; 4) medir conversiones reales; 5) considerar gasto solo con límite y autorización.
+- Para OBRAGUÍA, Metricool no tenía redes conectadas en la última verificación. No vincular la sesión personal de Alejo ni DEMARIA.
